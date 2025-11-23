@@ -1,0 +1,18 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <!-- Pizza base (crust) -->
+        <circle cx="50" cy="50" r="45" fill="#FBC02D"/>
+        <!-- Pizza cheese -->
+        <circle cx="50" cy="50" r="40" fill="#FFD54F"/>
+        <!-- Pizza slices -->
+        <path d="M50,50 L50,5 A45,45 0 0 1 95,50 Z" fill="#FBC02D"/>
+        <path d="M50,50 L50,10 A40,40 0 0 1 90,50 Z" fill="#FFD54F"/>
+        <!-- Toppings (pepperoni) -->
+        <circle cx="70" cy="30" r="4" fill="#D84315"/>
+        <circle cx="30" cy="70" r="4" fill="#D84315"/>
+        <circle cx="70" cy="70" r="4" fill="#D84315"/>
+        <circle cx="30" cy="30" r="4" fill="#D84315"/>
+        <circle cx="50" cy="50" r="4" fill="#D84315"/>
+    </g>
+</svg>
+

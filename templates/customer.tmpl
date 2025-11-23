@@ -1,0 +1,114 @@
+{{template "top" .}}
+<title>{{.Title}}</title>
+<style>
+    @keyframes spin-slow {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .animate-spin-slow {
+        animation: spin-slow 5s linear infinite;
+    }
+</style>
+</head>
+
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
+    <div class="flex flex-col items-center p-6 md:p-8">
+        <img src="/static/pizza.svg" alt="Pizza loading..." class="w-48 h-48 mb-10 animate-spin-slow drop-shadow-lg">
+        <div id="statusContainer"
+            class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-2xl border border-white/20 max-w-3xl w-full">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 text-center tracking-tight">
+                Track Your Pizza Order
+            </h1>
+            <div class="text-lg text-gray-500 mb-10 text-center font-medium">
+                Order #{{.Order.ID}}
+            </div>
+            <div class="relative flex justify-between items-center mb-4">
+                <div id="progressLine"
+                    class="absolute inset-x-[30px] h-1.5 bg-gray-200 top-1/2 -translate-y-1/2 rounded-full"></div>
+                {{range $index, $status := .Statuses}}
+                <div class="flex-1 flex justify-center relative mx-2">
+                    <div id="step{{add $index 1}}"
+                        class="size-14 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 z-10 shadow-md">
+                        {{add $index 1}}
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            <div class="flex justify-between text-sm text-gray-700 mb-10 font-semibold">
+                {{range .Statuses}}
+                <span class="flex-1 text-center mx-2">{{.}}</span>
+                {{end}}
+            </div>
+            <div class="bg-gray-50/60 p-6 rounded-2xl mb-6 border border-gray-100">
+                <h2 class="text-xl font-semibold text-gray-800 mb-5">Order Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Customer Name</p>
+                        <p class="font-semibold text-gray-900">{{.Order.CustomerName}}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Phone</p>
+                        <p class="font-semibold text-gray-900">{{.Order.Phone}}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Address</p>
+                        <p class="font-semibold text-gray-900">{{.Order.Address}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50/60 p-6 rounded-2xl mb-6 border border-gray-100">
+                <h2 class="text-xl font-semibold text-gray-800 mb-5">Pizzas</h2>
+                <div class="space-y-4">
+                    {{range $index, $pizza := .Order.Items}}
+                    <div class="border border-gray-200 rounded-xl p-5 bg-white/70">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            Pizza #{{add $index 1}}
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Type</p>
+                                <p class="font-semibold text-gray-900">{{$pizza.Pizza}}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Size</p>
+                                <p class="font-semibold text-gray-900">{{$pizza.Size}}</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <p class="text-sm text-gray-500 mb-1">Special Instructions</p>
+                                <p class="font-semibold text-gray-900">{{if $pizza.Instructions}}{{$pizza.Instructions}}{{else}}None{{end}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const statuses = {{json .Statuses}};
+        const orderId = "{{.Order.ID}}";
+
+        function updateStatusBar(currentStatus) {
+            const currentIndex = statuses.indexOf(currentStatus)
+            statuses.forEach((status, index) => {
+                const step = document.getElementById(`step${index+1}`);
+                if(index <= currentIndex) {
+                    step.classList.remove("bg-gray-300")
+                    step.classList.add("bg-emerald-500")
+                }
+            })
+
+            const progressLine = document.getElementById("progressLine");
+            const progressPercentage = Math.max(currentIndex / (statuses.length - 1 ) * 100, 5)
+            progressLine.style.background = `linear-gradient(to right, #10b981 ${progressPercentage}%, #e5e7eb ${progressPercentage}%)`;
+        }
+
+        updateStatusBar("{{.Order.Status}}")
+
+        const eventSrc = new EventSource(`/notifications?orderId=${orderId}`);
+        eventSrc.onmessage = () => location.reload();
+        eventSrc.onerror = err => console.error("EventSource failed:", err);
+    </script>
+    {{template "bottom" .}}

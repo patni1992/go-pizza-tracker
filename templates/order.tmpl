@@ -1,0 +1,97 @@
+{{template "top" .}}
+<title>New Pizza order</title>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 min-h-screen">
+<div class="flex items-center justify-center p-6 md:p-8">
+    <div class="bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-3xl shadow-xl border border-white/20 max-w-2xl w-full">
+        <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center tracking-tight">New Pizza Order</h1>
+        <form action="/new-order" method="POST" class="space-y-6">
+            <div class="space-y-5">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    Customer Information
+                </h2>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="name">Name</label>
+                    <input class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all" type="text" name="name" id="name" required minlength="2" maxlength="100">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="phone">Phone</label>
+                    <input class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all" type="text" name="phone" id="phone" required minlength="10" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2" for="name">Address</label>
+                    <input class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all" type="text" name="address" id="address" required minlength="5" maxlength="200">
+                </div>
+            </div>
+            <div class="space-y-5">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Pizzas</h2>
+                    <button type="button" onclick="addPizza()" class="px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 border border-emerald-300 rounded-xl hover:border-emerald-400 hover:bg-emerald-50 active:scale-95 transition-all">
+                        Add Another Pizza
+                    </button>
+                </div>
+                <div id="pizzas" class="space-y-4"></div>
+            </div>
+            <button type="submit" class="w-full bg-emerald-500 text-white font-semibold py-3 px-3 rounded-xl hover:bg-emerald-600 active:scale-[0.99] transition-all shadow-lg shadow-emerald-500/30">
+                Place Order
+            </button>
+        </form>
+    </div>
+</div>
+
+<template id="pizzaTemplate">
+    <div class="pizza-item border border-gray-200 roundex-2xl p-5 bg-gray-50/50">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Pizza #<span class="pizza-number"></span></h3>
+            <button type="button" onclick="removePizza(this)" class="text-red-500 hover:text-red-700 font-medium text-sm transition-colors">
+                Remove
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-meidum mb-2">Size</label>
+                <select name="size" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emrald-400 focus:border-transparent transition-all bg-white">
+                    {{range $.PizzaSizes}}
+                    <option value="{{.}}">{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-meidum mb-2">Pizza Type</label>
+                <select name="pizza" required class="w-full p-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emrald-400 focus:border-transparent transition-all bg-white">
+                    {{range $.PizzaTypes}}
+                    <option value="{{.}}">{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-meidum mb-2">Special instructions</label>
+                <textarea maxlength="200" name="instructions" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus-border-transparent transition-all resize-none"></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    let pizzaCount = 0;
+
+    function addPizza() {
+        const clone = document.getElementById("pizzaTemplate").content.cloneNode(true);
+        clone.querySelector(".pizza-number").textContent = ++pizzaCount;
+        document.getElementById("pizzas").appendChild(clone)
+    }
+
+    function removePizza(btn) {
+        btn.closest(".pizza-item").remove();
+
+        document.querySelectorAll(".pizza-item").forEach((item, index) => {
+            item.querySelector(".pizza-number").textContent = index + 1;
+        })
+
+        pizzaCount = document.querySelectorAll(".pizza-item").length;
+    }
+
+    addPizza();
+</script>
+
+{{template "bottom" .}}
